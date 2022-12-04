@@ -69,7 +69,6 @@ MTL::Library* library;
 MTL::Function* vert_fun;
 MTL::Function* frag_fun;
 
-MTL::CommandBuffer* command_buffer;
 MTL::RenderPipelineState* pipeline_state;
 
 // Other
@@ -241,6 +240,11 @@ void init_resources()
         std::cout << "Failed to create pipeline state: " << error->localizedDescription()->utf8String() << "\n";
         exit(EXIT_FAILURE);
     }
+
+    vert_fun->release();
+    frag_fun->release();
+    library->release();
+    descriptor->release();
 }
 
 void cleanup()
@@ -259,9 +263,6 @@ void cleanup_metal()
 {
     std::cout << "cleanup metal\n";
 
-    if (command_buffer)
-        command_buffer->release();
-
     command_queue->release();
 
     device->release();
@@ -270,11 +271,6 @@ void cleanup_metal()
 void cleanup_resources()
 {
     std::cout << "cleanup resources\n";
-
-    vert_fun->release();
-    frag_fun->release();
-
-    library->release();
 
     vertex_buffer->release();
     index_buffer->release();
@@ -285,10 +281,9 @@ void cleanup_resources()
 
 void render()
 {
-    if (command_buffer)
-        command_buffer->release();
 
-    command_buffer = command_queue->commandBuffer();
+    NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
+    MTL::CommandBuffer* command_buffer = command_queue->commandBuffer();
     command_buffer->setLabel(NSSTRING("My command"));
 
     CA::MetalDrawable* drawable = layer->nextDrawable();
@@ -342,6 +337,7 @@ void render()
     command_buffer->presentDrawable(drawable);
     command_buffer->commit();
 
+    pool->release();
 }
 
 void process_input()
