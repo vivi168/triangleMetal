@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <cstdlib>
 
 #define NS_PRIVATE_IMPLEMENTATION
@@ -356,15 +357,11 @@ void frame_start()
     current_time = SDL_GetTicks();
 
     delta_time = (float)(current_time - last_time) / 1000;
-}
 
-void delay()
-{
-    Uint32 frame_time;
-
-    frame_time = SDL_GetTicks() - current_time;
-    if (TICKS_PER_FRAME > frame_time) {
-        SDL_Delay(TICKS_PER_FRAME - frame_time);
+    // show FPS
+    {
+        std::string s = "FPS: " + std::to_string(1.0f / delta_time);
+        SDL_SetWindowTitle(sdl_window, s.c_str());
     }
 }
 
@@ -381,7 +378,6 @@ void mainloop()
         process_input();
 
         render();
-        delay();
     }
 }
 
