@@ -21,6 +21,8 @@
 #define WINDOW_HEIGHT 600
 #define TICKS_PER_FRAME 60
 
+#define NSSTRING(s) (NS::String::string((s), NS::ASCIIStringEncoding))
+
 enum {
     X = 0, Y, Z, W
 };
@@ -158,17 +160,17 @@ void init_resources()
 
     // vertex buffer
     vertex_buffer = device->newBuffer(sizeof(Vertex) * 3, MTL::CPUCacheModeDefaultCache);
-    vertex_buffer->setLabel(NS::String::string("VBO", NS::ASCIIStringEncoding));
+    vertex_buffer->setLabel(NSSTRING("VBO"));
     memcpy(vertex_buffer->contents(), vertex_data, sizeof(Vertex) * 3);
 
     // index buffer
     index_buffer = device->newBuffer(sizeof(uint32_t) * 3, MTL::CPUCacheModeDefaultCache);
-    index_buffer->setLabel(NS::String::string("IBO", NS::ASCIIStringEncoding));
+    index_buffer->setLabel(NSSTRING("IBO"));
     memcpy(index_buffer->contents(), index_data, sizeof(uint32_t) * 3);
 
     // uniform buffer
     uniform_buffer = device->newBuffer((sizeof(UBO_VS) + 0xff) & ~0xff, MTL::CPUCacheModeDefaultCache);
-    uniform_buffer->setLabel(NS::String::string("UBO", NS::ASCIIStringEncoding));
+    uniform_buffer->setLabel(NSSTRING("UBO"));
 
     {
         mymodel.translate = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -184,7 +186,7 @@ void init_resources()
     }
 
     // loading shaders
-    NS::String* filePath = NS::String::string("shader.metallib", NS::ASCIIStringEncoding);
+    NS::String* filePath = NSSTRING("shader.metallib");
     library = device->newLibrary(filePath, &error);
 
     if(error) {
@@ -197,8 +199,8 @@ void init_resources()
         exit(EXIT_FAILURE);
     }
 
-    vert_fun = library->newFunction(NS::String::string("VS", NS::ASCIIStringEncoding));
-    frag_fun = library->newFunction(NS::String::string("FS", NS::ASCIIStringEncoding));
+    vert_fun = library->newFunction(NSSTRING("VS"));
+    frag_fun = library->newFunction(NSSTRING("FS"));
 
     if (!vert_fun) {
         std::cerr << "Failed to load VS function from library\n";
@@ -212,7 +214,7 @@ void init_resources()
 
     // pipeline
     MTL::RenderPipelineDescriptor* descriptor = MTL::RenderPipelineDescriptor::alloc()->init();
-    descriptor->setLabel(NS::String::string("Simple pipeline", NS::ASCIIStringEncoding));
+    descriptor->setLabel(NSSTRING("Simple pipeline"));
     descriptor->setVertexFunction(vert_fun);
     descriptor->setFragmentFunction(frag_fun);
     descriptor->colorAttachments()->object(0)->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
@@ -286,7 +288,7 @@ void render()
         command_buffer->release();
 
     command_buffer = command_queue->commandBuffer();
-    command_buffer->setLabel(NS::String::string("My command", NS::ASCIIStringEncoding));
+    command_buffer->setLabel(NSSTRING("My command"));
 
     CA::MetalDrawable* drawable = layer->nextDrawable();
 
@@ -307,7 +309,7 @@ void render()
     assert(renderpass_desc);
 
     MTL::RenderCommandEncoder* encoder = command_buffer->renderCommandEncoder(renderpass_desc);
-    encoder->setLabel(NS::String::string("My encoder", NS::ASCIIStringEncoding));
+    encoder->setLabel(NSSTRING("My encoder"));
 
     MTL::Viewport viewport = {
         0.0,
