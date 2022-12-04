@@ -153,6 +153,17 @@ void init_metal()
     command_queue = device->newCommandQueue();
 }
 
+void update_uniform()
+{
+    glm::mat4 p = glm::perspective(camera.zoom(), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 1000.0f);
+    glm::mat4 v = camera.look_at();
+    glm::mat4 m = model_mat(&mymodel);
+    ubo_data.mvp = p * v * m;
+    /* ubo_data.mvp = glm::mat4(1.0f); */
+
+    memcpy(uniform_buffer->contents(), &ubo_data, sizeof(ubo_data));
+}
+
 void init_resources()
 {
     NS::Error* error;
@@ -176,13 +187,7 @@ void init_resources()
         mymodel.translate = glm::vec3(0.0f, 0.0f, 0.0f);
         mymodel.scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
-        glm::mat4 p = glm::perspective(camera.zoom(), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 1000.0f);
-        glm::mat4 v = camera.look_at();
-        glm::mat4 m = model_mat(&mymodel);
-        ubo_data.mvp = p * v * m;
-        /* ubo_data.mvp = glm::mat4(1.0f); */
-
-        memcpy(uniform_buffer->contents(), &ubo_data, sizeof(ubo_data));
+        update_uniform();
     }
 
     // loading shaders
@@ -281,6 +286,7 @@ void cleanup_resources()
 
 void render()
 {
+    update_uniform();
 
     NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
     MTL::CommandBuffer* command_buffer = command_queue->commandBuffer();
@@ -342,8 +348,16 @@ void render()
 
 void process_input()
 {
-    if (input_mgr.quit_requested() || input_mgr.is_pressed(SDLK_ESCAPE)) {
+    if (input_mgr.quit_requested() || input_mgr.is_pressed(KEY_QUIT)) {
         quit = true;
+    }
+
+    if (input_mgr.is_held(KEY_UP)) {
+        camera.process_keyboard(CameraDirection::FORWARD, delta_time);
+    }
+
+    if (input_mgr.is_held(KEY_DOWN)) {
+        camera.process_keyboard(CameraDirection::BACKWARD, delta_time);
     }
 }
 
