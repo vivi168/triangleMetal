@@ -222,7 +222,7 @@ void init_resources()
     descriptor->setLabel(NSSTRING("Simple pipeline"));
     descriptor->setVertexFunction(vert_fun);
     descriptor->setFragmentFunction(frag_fun);
-    descriptor->colorAttachments()->object(0)->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
+    descriptor->colorAttachments()->object(0)->setPixelFormat(MTL::PixelFormat::PixelFormatRGBA8Unorm_sRGB);
 
     MTL::VertexDescriptor* vert_desc = MTL::VertexDescriptor::vertexDescriptor();
     // position attr
@@ -335,8 +335,7 @@ void render()
             NS::UInteger(3),
             MTL::IndexTypeUInt32,
             index_buffer,
-            NS::UInteger(0)
-            );
+            NS::UInteger(0));
 
     encoder->endEncoding();
 
