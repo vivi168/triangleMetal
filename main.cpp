@@ -5,6 +5,7 @@
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 #include "renderer.h"
 
@@ -22,7 +23,9 @@ struct Model {
     glm::mat4 model_mat()
     {
         glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 rot = glm::eulerAngleZYX(rotate.z, rotate.y, rotate.x);
         model = glm::translate(model, translate);
+        model *= rot;
         model = glm::scale(model, scale);
 
         return model;
@@ -36,6 +39,7 @@ public:
     {
         triangle.translate = glm::vec3(0.0f, 0.0f, 0.0f);
         triangle.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+        triangle.rotate = glm::vec3(0.0f, 0.0f, glm::half_pi<float>());
     }
 
     int run(Renderer* renderer)
@@ -77,6 +81,13 @@ private:
 
         if (input_mgr.is_held(KEY_DOWN)) {
             camera.process_keyboard(CameraDirection::BACKWARD, delta_time);
+        }
+
+        if (input_mgr.is_held(KEY_LEFT)) {
+            triangle.rotate.z += 0.05;
+        }
+        else if (input_mgr.is_held(KEY_RIGHT)) {
+            triangle.rotate.z -= 0.05;
         }
     }
 
