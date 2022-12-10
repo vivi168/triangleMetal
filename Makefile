@@ -3,7 +3,7 @@ CFLAGS := -g -Wall -Wextra -std=c++17 -I./include
 LDFLAGS := -framework Metal -framework Foundation -framework Quartz -lSDL2
 
 EXE := triangle
-SRC := main.cpp camera.cpp
+SRC := camera.cpp main.cpp renderer.cpp
 OBJ := $(SRC:.cpp=.o)
 
 all: $(EXE) shader.metallib
